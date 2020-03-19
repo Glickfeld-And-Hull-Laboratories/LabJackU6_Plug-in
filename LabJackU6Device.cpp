@@ -689,6 +689,7 @@ bool LabJackU6Device::readLeverDI(bool *outLever1, bool *cameraState, bool *came
     
     if (ljU6ReadPorts(ljHandle, &fioState, &eioState, &cioState) != 0 ) {
         merror(M_IODEVICE_MESSAGE_DOMAIN, "Error reading DI, stopping IO and returning FALSE");
+        lock.unlock();  // Release the driver lock, otherwise we may deadlock in stopDeviceIO
         stopDeviceIO();  // We are seeing USB errors causing this, and the U6 doesn't work anyway, so might as well stop the threads
         return false;
     }
