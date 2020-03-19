@@ -315,6 +315,7 @@
 					/usr/local/lib,
 				);
 				OTHER_LDFLAGS = "-headerpad_max_install_names";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.github.Glickfeld-And-Hull-Laboratories.LabJackU6-Plug-in";
 				PRODUCT_NAME = LabJackU6Plugin;
 			};
 			name = Development;
