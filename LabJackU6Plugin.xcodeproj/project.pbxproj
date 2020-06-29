@@ -311,8 +311,8 @@
 				);
 				INFOPLIST_FILE = Info.plist;
 				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
 					/usr/local/lib,
+					"$(inherited)",
 				);
 				OTHER_LDFLAGS = "-headerpad_max_install_names";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.github.Glickfeld-And-Hull-Laboratories.LabJackU6-Plug-in";
