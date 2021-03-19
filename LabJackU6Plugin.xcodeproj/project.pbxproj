@@ -40,7 +40,6 @@
 		81BCE9CE1180B3A600C0AC5B /* LabJackU6Device.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 81BCE9CB1180B3A600C0AC5B /* LabJackU6Device.cpp */; };
 		8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
 		E1FAFEA517BE61B80047AE5C /* LabJackU6Plugin.bundle in CopyFiles */ = {isa = PBXBuildFile; fileRef = 81BCEAB21180EDE000C0AC5B /* LabJackU6Plugin.bundle */; };
-		E1FAFEA917BE69BC0047AE5C /* libboost_system.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E1FAFEA817BE69BC0047AE5C /* libboost_system.a */; };
 		E1FAFEAB17BE6A570047AE5C /* liblabjackusb.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E1FAFEAA17BE6A570047AE5C /* liblabjackusb.dylib */; };
 		E1FAFEAD17BE6AA40047AE5C /* libusb-1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E1FAFEAC17BE6AA40047AE5C /* libusb-1.0.dylib */; };
 /* End PBXBuildFile section */
@@ -89,7 +88,6 @@
 		8D5B49B7048680CD000E48DA /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		E188D6012423B976000E0C91 /* macOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = macOS.xcconfig; sourceTree = "<group>"; };
 		E188D6022423B976000E0C91 /* macOS_Plugin.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = macOS_Plugin.xcconfig; sourceTree = "<group>"; };
-		E1FAFEA817BE69BC0047AE5C /* libboost_system.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_system.a; path = "/Library/Application Support/MWorks/Developer/lib/libboost_system.a"; sourceTree = "<absolute>"; };
 		E1FAFEAA17BE6A570047AE5C /* liblabjackusb.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = liblabjackusb.dylib; path = /usr/local/lib/liblabjackusb.dylib; sourceTree = "<absolute>"; };
 		E1FAFEAC17BE6AA40047AE5C /* libusb-1.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libusb-1.0.dylib"; path = "/usr/local/lib/libusb-1.0.dylib"; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
@@ -100,7 +98,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				5C4B0A650DC79212001BC518 /* MWorksCore.framework in Frameworks */,
-				E1FAFEA917BE69BC0047AE5C /* libboost_system.a in Frameworks */,
 				E1FAFEAB17BE6A570047AE5C /* liblabjackusb.dylib in Frameworks */,
 				E1FAFEAD17BE6AA40047AE5C /* libusb-1.0.dylib in Frameworks */,
 			);
@@ -126,7 +123,6 @@
 			isa = PBXGroup;
 			children = (
 				5C4B0A630DC79212001BC518 /* MWorksCore.framework */,
-				E1FAFEA817BE69BC0047AE5C /* libboost_system.a */,
 				E1FAFEAA17BE6A570047AE5C /* liblabjackusb.dylib */,
 				E1FAFEAC17BE6AA40047AE5C /* libusb-1.0.dylib */,
 			);
