@@ -983,11 +983,15 @@ bool LabJackU6Device::stopDeviceIO(){
     laserDO(0);
     laserDO2(false);
     
-    if (!ljU6WriteDO(ljHandle, LJU6_LED1_FIO, 0) == 1)
-        return false; // merror is done in ljU6WriteDO
-    
-    if (!ljU6WriteDO(ljHandle, LJU6_LED2_FIO, 0) == 1)
-        return false; // merror is done in ljU6WriteDO
+    {
+        boost::mutex::scoped_lock lock(ljU6DriverLock);
+        
+        if (!ljU6WriteDO(ljHandle, LJU6_LED1_FIO, 0) == 1)
+            return false; // merror is done in ljU6WriteDO
+        
+        if (!ljU6WriteDO(ljHandle, LJU6_LED2_FIO, 0) == 1)
+            return false; // merror is done in ljU6WriteDO
+    }
 
     this->led1_status->setValue(false);
     this->led2_status->setValue(false);
