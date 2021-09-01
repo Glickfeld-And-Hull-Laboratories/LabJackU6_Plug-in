@@ -39,10 +39,10 @@
 		81BCE9CA1180B39E00C0AC5B /* LabJackU6Plugin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 81BCE9C91180B39E00C0AC5B /* LabJackU6Plugin.cpp */; };
 		81BCE9CE1180B3A600C0AC5B /* LabJackU6Device.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 81BCE9CB1180B3A600C0AC5B /* LabJackU6Device.cpp */; };
 		8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
+		E18840C626A220080087D106 /* labjackusb.c in Sources */ = {isa = PBXBuildFile; fileRef = E18840C426A220080087D106 /* labjackusb.c */; };
+		E18840C826A220800087D106 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E18840C726A220800087D106 /* CoreFoundation.framework */; };
+		E18840CA26A220960087D106 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E18840C926A220960087D106 /* IOKit.framework */; };
 		E1FAFEA517BE61B80047AE5C /* LabJackU6Plugin.bundle in CopyFiles */ = {isa = PBXBuildFile; fileRef = 81BCEAB21180EDE000C0AC5B /* LabJackU6Plugin.bundle */; };
-		E1FAFEA917BE69BC0047AE5C /* libboost_system.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E1FAFEA817BE69BC0047AE5C /* libboost_system.a */; };
-		E1FAFEAB17BE6A570047AE5C /* liblabjackusb.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E1FAFEAA17BE6A570047AE5C /* liblabjackusb.dylib */; };
-		E1FAFEAD17BE6AA40047AE5C /* libusb-1.0.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E1FAFEAC17BE6AA40047AE5C /* libusb-1.0.dylib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,7 +79,7 @@
 		089C167EFE841241C02AAC07 /* English */ = {isa = PBXFileReference; fileEncoding = 10; lastKnownFileType = text.plist.strings; name = English; path = English.lproj/InfoPlist.strings; sourceTree = "<group>"; };
 		5C4B0A630DC79212001BC518 /* MWorksCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MWorksCore.framework; path = /Library/Frameworks/MWorksCore.framework; sourceTree = "<absolute>"; };
 		69684B0E11D6B13F00DE339D /* MWLibrary.xml */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = MWLibrary.xml; sourceTree = "<group>"; };
-		8173562F11861FDD0080AEB7 /* u6.c */ = {isa = PBXFileReference; explicitFileType = sourcecode.cpp.cpp; fileEncoding = 4; name = u6.c; path = exodriver/examples/U6/u6.c; sourceTree = "<group>"; };
+		8173562F11861FDD0080AEB7 /* u6.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = u6.c; path = exodriver/examples/U6/u6.c; sourceTree = "<group>"; };
 		8173563011861FDD0080AEB7 /* u6.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = u6.h; path = exodriver/examples/U6/u6.h; sourceTree = "<group>"; };
 		81BCE9C91180B39E00C0AC5B /* LabJackU6Plugin.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LabJackU6Plugin.cpp; sourceTree = "<group>"; };
 		81BCE9CB1180B3A600C0AC5B /* LabJackU6Device.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LabJackU6Device.cpp; sourceTree = "<group>"; };
@@ -87,11 +87,12 @@
 		81BCE9CD1180B3A600C0AC5B /* LabJackU6Plugin_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LabJackU6Plugin_Prefix.pch; sourceTree = "<group>"; };
 		81BCEAB21180EDE000C0AC5B /* LabJackU6Plugin.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LabJackU6Plugin.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D5B49B7048680CD000E48DA /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E18840C426A220080087D106 /* labjackusb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = labjackusb.c; path = exodriver/liblabjackusb/labjackusb.c; sourceTree = "<group>"; };
+		E18840C526A220080087D106 /* labjackusb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = labjackusb.h; path = exodriver/liblabjackusb/labjackusb.h; sourceTree = "<group>"; };
+		E18840C726A220800087D106 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
+		E18840C926A220960087D106 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		E188D6012423B976000E0C91 /* macOS.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = macOS.xcconfig; sourceTree = "<group>"; };
 		E188D6022423B976000E0C91 /* macOS_Plugin.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = macOS_Plugin.xcconfig; sourceTree = "<group>"; };
-		E1FAFEA817BE69BC0047AE5C /* libboost_system.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libboost_system.a; path = "/Library/Application Support/MWorks/Developer/lib/libboost_system.a"; sourceTree = "<absolute>"; };
-		E1FAFEAA17BE6A570047AE5C /* liblabjackusb.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = liblabjackusb.dylib; path = /usr/local/lib/liblabjackusb.dylib; sourceTree = "<absolute>"; };
-		E1FAFEAC17BE6AA40047AE5C /* libusb-1.0.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = "libusb-1.0.dylib"; path = "/usr/local/lib/libusb-1.0.dylib"; sourceTree = "<absolute>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -100,9 +101,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				5C4B0A650DC79212001BC518 /* MWorksCore.framework in Frameworks */,
-				E1FAFEA917BE69BC0047AE5C /* libboost_system.a in Frameworks */,
-				E1FAFEAB17BE6A570047AE5C /* liblabjackusb.dylib in Frameworks */,
-				E1FAFEAD17BE6AA40047AE5C /* libusb-1.0.dylib in Frameworks */,
+				E18840C826A220800087D106 /* CoreFoundation.framework in Frameworks */,
+				E18840CA26A220960087D106 /* IOKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -116,21 +116,20 @@
 				08FB77AFFE84173DC02AAC07 /* Classes */,
 				32C88E010371C26100C91783 /* Other Sources */,
 				089C167CFE841241C02AAC07 /* Resources */,
-				089C1671FE841209C02AAC07 /* Frameworks and Libraries */,
+				089C1671FE841209C02AAC07 /* Frameworks */,
 				19C28FB8FE9D52D311CA2CBB /* Products */,
 			);
 			name = CoxlabCorePlugins;
 			sourceTree = "<group>";
 		};
-		089C1671FE841209C02AAC07 /* Frameworks and Libraries */ = {
+		089C1671FE841209C02AAC07 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
 				5C4B0A630DC79212001BC518 /* MWorksCore.framework */,
-				E1FAFEA817BE69BC0047AE5C /* libboost_system.a */,
-				E1FAFEAA17BE6A570047AE5C /* liblabjackusb.dylib */,
-				E1FAFEAC17BE6AA40047AE5C /* libusb-1.0.dylib */,
+				E18840C726A220800087D106 /* CoreFoundation.framework */,
+				E18840C926A220960087D106 /* IOKit.framework */,
 			);
-			name = "Frameworks and Libraries";
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 		089C167CFE841241C02AAC07 /* Resources */ = {
@@ -146,6 +145,8 @@
 		08FB77AFFE84173DC02AAC07 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				E18840C526A220080087D106 /* labjackusb.h */,
+				E18840C426A220080087D106 /* labjackusb.c */,
 				8173563011861FDD0080AEB7 /* u6.h */,
 				8173562F11861FDD0080AEB7 /* u6.c */,
 				81BCE9CC1180B3A600C0AC5B /* LabJackU6Device.h */,
@@ -191,7 +192,6 @@
 				8D5B49B1048680CD000E48DA /* Sources */,
 				8D5B49B3048680CD000E48DA /* Frameworks */,
 				8D5B49AF048680CD000E48DA /* Resources */,
-				E1FAFEAE17BE6F610047AE5C /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -244,23 +244,6 @@
 		};
 /* End PBXResourcesBuildPhase section */
 
-/* Begin PBXShellScriptBuildPhase section */
-		E1FAFEAE17BE6F610047AE5C /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "/usr/bin/xcrun install_name_tool -change \\\n  liblabjackusb.dylib \\\n  /usr/local/lib/liblabjackusb.dylib \\\n  \"${BUILT_PRODUCTS_DIR}/${EXECUTABLE_PATH}\"\n";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
-
 /* Begin PBXSourcesBuildPhase section */
 		8D5B49B1048680CD000E48DA /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
@@ -269,6 +252,7 @@
 				81BCE9CA1180B39E00C0AC5B /* LabJackU6Plugin.cpp in Sources */,
 				81BCE9CE1180B3A600C0AC5B /* LabJackU6Device.cpp in Sources */,
 				8173563111861FDD0080AEB7 /* u6.c in Sources */,
+				E18840C626A220080087D106 /* labjackusb.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -305,16 +289,11 @@
 			buildSettings = {
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = LabJackU6Plugin_Prefix.pch;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					/usr/local/include,
-				);
 				INFOPLIST_FILE = Info.plist;
-				LIBRARY_SEARCH_PATHS = (
-					/usr/local/lib,
+				OTHER_LDFLAGS = (
 					"$(inherited)",
+					"-lusb-1.0",
 				);
-				OTHER_LDFLAGS = "-headerpad_max_install_names";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.github.Glickfeld-And-Hull-Laboratories.LabJackU6-Plug-in";
 				PRODUCT_NAME = LabJackU6Plugin;
 			};

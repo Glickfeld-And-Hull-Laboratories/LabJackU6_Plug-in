@@ -2,8 +2,8 @@
 //
 //  labjackusb.c
 //
-//    Library for accessing a U3, U6, UE9, SkyMote bridge, T7 and Digit over
-//    USB.
+//    Library for accessing U3, U6, UE9, SkyMote bridge, T4, T7, and Digit
+//    devices over USB.
 //
 //  support@labjack.com
 //
@@ -222,63 +222,91 @@ static int LJUSB_libusbError(int r)
     case LIBUSB_SUCCESS:
         // No error
         return 0;
-        break;
+
     case LIBUSB_ERROR_IO:
+#if LJ_DEBUG
         fprintf(stderr, "libusb error: LIBUSB_ERROR_IO\n");
+#endif
         errno = EIO;
         break;
     case LIBUSB_ERROR_INVALID_PARAM:
+#if LJ_DEBUG
         fprintf(stderr, "libusb error: LIBUSB_ERROR_INVALID_PARAM\n");
+#endif
         errno = EINVAL;
         break;
     case LIBUSB_ERROR_ACCESS:
+#if LJ_DEBUG
         fprintf(stderr, "libusb error: LIBUSB_ERROR_ACCESS\n");
+#endif
         errno = EACCES;
         break;
     case LIBUSB_ERROR_NO_DEVICE:
+#if LJ_DEBUG
         fprintf(stderr, "libusb error: LIBUSB_ERROR_NO_DEVICE\n");
+#endif
         errno = ENXIO;
         break;
     case LIBUSB_ERROR_NOT_FOUND:
+#if LJ_DEBUG
         fprintf(stderr, "libusb error: LIBUSB_ERROR_NOT_FOUND\n");
+#endif
         errno = ENOENT;
         break;
     case LIBUSB_ERROR_BUSY:
+#if LJ_DEBUG
         fprintf(stderr, "libusb error: LIBUSB_ERROR_BUSY\n");
+#endif
         errno = EBUSY;
         break;
     case LIBUSB_ERROR_TIMEOUT:
+#if LJ_DEBUG
         fprintf(stderr, "libusb error: LIBUSB_ERROR_TIMEOUT\n");
+#endif
         errno = ETIMEDOUT;
         break;
     case LIBUSB_ERROR_OVERFLOW:
+#if LJ_DEBUG
         fprintf(stderr, "libusb error: LIBUSB_ERROR_OVERFLOW\n");
+#endif
         errno = EOVERFLOW;
         break;
     case LIBUSB_ERROR_PIPE:
+#if LJ_DEBUG
         fprintf(stderr, "libusb error: LIBUSB_ERROR_PIPE\n");
+#endif
         errno = EPIPE;
         break;
     case LIBUSB_ERROR_INTERRUPTED:
+#if LJ_DEBUG
         fprintf(stderr, "libusb error: LIBUSB_ERROR_INTERRUPTED\n");
+#endif
         errno = EINTR;
         break;
     case LIBUSB_ERROR_NO_MEM:
+#if LJ_DEBUG
         fprintf(stderr, "libusb error: LIBUSB_ERROR_NO_MEM\n");
+#endif
         errno = ENOMEM;
         break;
     case LIBUSB_ERROR_NOT_SUPPORTED:
+#if LJ_DEBUG
         fprintf(stderr, "libusb error: LIBUSB_ERROR_NOT_SUPPORTED\n");
+#endif
         errno = ENOSYS;
         break;
     case LIBUSB_ERROR_OTHER:
+#if LJ_DEBUG
         fprintf(stderr, "libusb error: LIBUSB_ERROR_OTHER\n");
+#endif
         if (errno == 0) {
             errno = ENOSYS;
         }
         break;
     default:
+#if LJ_DEBUG
         fprintf(stderr, "libusb error: Unexpected error code: %d.\n", r);
+#endif
         if (errno == 0) {
             errno = ENOSYS;
         }
@@ -352,7 +380,7 @@ static bool LJUSB_isRecentKernel(void)
     unsigned long kernelMajor = 0, kernelMinor = 0, kernelRev = 0;
 
     if (uname(&u) != 0) {
-        fprintf(stderr, "Error calling uname(2).");
+        fprintf(stderr, "Error calling uname(2).\n");
         return false;
     }
 
@@ -425,6 +453,10 @@ static bool LJUSB_isMinFirmware(HANDLE hDevice, unsigned long ProductID)
         return true;
     case BRIDGE_PRODUCT_ID: //Add Wireless bridge stuff Mike F.
         return true;
+    case T4_PRODUCT_ID:
+        return true;
+    case T5_PRODUCT_ID:
+        return true;
     case T7_PRODUCT_ID:
         return true;
     case DIGIT_PRODUCT_ID:
@@ -435,6 +467,20 @@ static bool LJUSB_isMinFirmware(HANDLE hDevice, unsigned long ProductID)
     }
 }
 
+static bool LJUSB_libusb_initialize(void)
+{
+    if (!gIsLibUSBInitialized) {
+        int r = libusb_init(&gLJContext);
+        if (r < 0) {
+            fprintf(stderr, "failed to initialize libusb\n");
+            LJUSB_libusbError(r);
+            return false;
+        }
+        gIsLibUSBInitialized = true;
+    }
+    
+    return true;
+}
 
 static void LJUSB_libusb_exit(void)
 {
@@ -451,12 +497,49 @@ float LJUSB_GetLibraryVersion(void)
     return LJUSB_LIBRARY_VERSION;
 }
 
+static HANDLE LJUSB_OpenSpecificDevice(libusb_device *dev, const struct libusb_device_descriptor *desc)
+{
+    int r = 1;
+    struct libusb_device_handle *devh = NULL;
+
+    // Open the device to get handle.
+    r = libusb_open(dev, &devh);
+    if (r < 0) {
+        LJUSB_libusbError(r);
+        return NULL;
+    }
+
+    // Test if the kernel driver has the U12.
+    if (desc->idProduct == U12_PRODUCT_ID && libusb_kernel_driver_active(devh, 0)) {
+#if LJ_DEBUG
+        fprintf(stderr, "Kernel Driver was active, detaching...\n");
+#endif
+
+        // Detach the U12 from kernel driver.
+        r = libusb_detach_kernel_driver(devh, 0);
+
+        // Check the return value
+        if ( r != 0 ) {
+            libusb_close(devh);
+            fprintf(stderr, "failed to detach from kernel driver. Error Number: %i\n", r);
+            return NULL;
+        }
+    }
+
+    r = libusb_claim_interface(devh, 0);
+    if (r < 0) {
+        LJUSB_libusbError(r);
+        libusb_close(devh);
+        return NULL;
+    }
+
+    return (HANDLE) devh;
+}
 
 HANDLE LJUSB_OpenDevice(UINT DevNum, unsigned int dwReserved, unsigned long ProductID)
 {
     (void)dwReserved;
     libusb_device **devs = NULL, *dev = NULL;
-    struct libusb_device_handle *devh = NULL;
     struct libusb_device_descriptor desc;
     ssize_t cnt = 0;
     int r = 1;
@@ -464,14 +547,8 @@ HANDLE LJUSB_OpenDevice(UINT DevNum, unsigned int dwReserved, unsigned long Prod
     unsigned int ljFoundCount = 0;
     HANDLE handle = NULL;
 
-    if (!gIsLibUSBInitialized) {
-        r = libusb_init(&gLJContext);
-        if (r < 0) {
-            fprintf(stderr, "failed to initialize libusb\n");
-            LJUSB_libusbError(r);
-            return NULL;
-        }
-        gIsLibUSBInitialized = true;
+    if (!LJUSB_libusb_initialize()) {
+        return NULL;
     }
 
     cnt = libusb_get_device_list(gLJContext, &devs);
@@ -488,7 +565,7 @@ HANDLE LJUSB_OpenDevice(UINT DevNum, unsigned int dwReserved, unsigned long Prod
 #endif
         r = libusb_get_device_descriptor(dev, &desc);
         if (r < 0) {
-            fprintf(stderr, "failed to get device descriptor");
+            fprintf(stderr, "failed to get device descriptor\n");
             LJUSB_libusbError(r);
             LJUSB_libusb_exit();
             return NULL;
@@ -497,39 +574,12 @@ HANDLE LJUSB_OpenDevice(UINT DevNum, unsigned int dwReserved, unsigned long Prod
         if (LJ_VENDOR_ID == desc.idVendor && ProductID == desc.idProduct) {
             ljFoundCount++;
             if (ljFoundCount == DevNum) {
-                // Found the one requested
-                r = libusb_open(dev, &devh);
-                if (r < 0) {
-                    LJUSB_libusbError(r);
-                    return NULL;
-                }
+                handle = LJUSB_OpenSpecificDevice(dev, &desc);
 
-                // Test if the kernel driver has the device.
-                // Should only be true for HIDs.
-                if (libusb_kernel_driver_active(devh, 0)) {
 #if LJ_DEBUG
-                    fprintf(stderr, "Kernel Driver was active, detaching...\n");
-#endif
-
-                    // Detaches U12s from kernel driver.
-                    r = libusb_detach_kernel_driver(devh, 0);
-
-                    // Check the return value
-                    if ( r != 0 ) {
-                        fprintf(stderr, "failed to detach from kernel driver. Error Number: %i", r);
-                        return NULL;
-                    }
+                if (handle) {
+                    fprintf(stderr, "LJUSB_OpenDevice: Found handle for product ID %ld\n", ProductID);
                 }
-
-                r = libusb_claim_interface(devh, 0);
-                if (r < 0) {
-                    LJUSB_libusbError(r);
-                    libusb_close(devh);
-                    return NULL;
-                }
-                handle = (HANDLE) devh;
-#if LJ_DEBUG
-                fprintf(stderr, "LJUSB_OpenDevice: Found handle for product ID %ld\n", ProductID);
 #endif
                 break;
             }
@@ -562,14 +612,8 @@ int LJUSB_OpenAllDevices(HANDLE* devHandles, UINT* productIds, UINT maxDevices)
     unsigned int i = 0, ljFoundCount = 0;
     HANDLE handle = NULL;
 
-    if (!gIsLibUSBInitialized) {
-        r = libusb_init(&gLJContext);
-        if (r < 0) {
-            fprintf(stderr, "failed to initialize libusb\n");
-            LJUSB_libusbError(r);
-            return -1;
-        }
-        gIsLibUSBInitialized = true;
+    if (!LJUSB_libusb_initialize()) {
+        return -1;
     }
 
     cnt = libusb_get_device_list(gLJContext, &devs);
@@ -582,51 +626,18 @@ int LJUSB_OpenAllDevices(HANDLE* devHandles, UINT* productIds, UINT maxDevices)
 
     while ((dev = devs[i++]) != NULL) {
 #if LJ_DEBUG
-        fprintf(stderr, "LJUSB_OpenDevice: calling libusb_get_device_descriptor\n");
+        fprintf(stderr, "LJUSB_OpenAllDevices: calling libusb_get_device_descriptor\n");
 #endif
         r = libusb_get_device_descriptor(dev, &desc);
         if (r < 0) {
-            fprintf(stderr, "failed to get device descriptor");
+            fprintf(stderr, "failed to get device descriptor\n");
             LJUSB_libusbError(r);
             LJUSB_libusb_exit();
             return -1;
         }
 
         if (LJ_VENDOR_ID == desc.idVendor) {
-            // Found a LabJack device
-            r = libusb_open(dev, &devh);
-            if (r < 0) {
-                LJUSB_libusbError(r);
-                continue;
-            }
-
-            // Test if the kernel driver has the device.
-            // Should only be true for HIDs.
-            if (libusb_kernel_driver_active(devh, 0) ) {
-#if LJ_DEBUG
-                fprintf(stderr, "Kernel Driver was active, detaching...\n");
-#endif
-
-                // Detaches U12s from kernel driver.
-                r = libusb_detach_kernel_driver(devh, 0);
-
-                // Check the return value
-                if ( r != 0 ) {
-                    fprintf(stderr, "failed to detach from kernel driver. Error Number: %i", r);
-                    libusb_close(devh);
-                    continue;
-                }
-            }
-
-            r = libusb_claim_interface(devh, 0);
-            if (r < 0) {
-                //LJUSB_libusbError(r);
-                libusb_close(devh);
-                continue;
-            }
-
-            handle = (HANDLE) devh;
-
+            handle = LJUSB_OpenSpecificDevice(dev, &desc);
             if (handle == NULL) {
                 // Not a valid handle
                 continue;
@@ -720,7 +731,7 @@ static unsigned long LJUSB_DoTransfer(HANDLE hDevice, unsigned char endpoint, BY
     }
 
     if (r == LIBUSB_ERROR_TIMEOUT) {
-        //Timeout occured but may have received partial data.  Setting errno but
+        //Timeout occurred but may have received partial data.  Setting errno but
         //returning the number of bytes transferred which may be > 0.
 #if LJ_DEBUG
         fprintf(stderr, "LJUSB_DoTransfer: Transfer timed out. Returning.\n");
@@ -841,6 +852,40 @@ static unsigned long LJUSB_SetupTransfer(HANDLE hDevice, BYTE *pBuff, unsigned l
             return 0;
         }
         break;
+    case T4_PRODUCT_ID:
+        isBulk = true;
+        switch (operation) {
+        case LJUSB_WRITE:
+            endpoint = T4_PIPE_EP1_OUT;
+            break;
+        case LJUSB_READ:
+            endpoint = T4_PIPE_EP2_IN;
+            break;
+        case LJUSB_STREAM:
+            endpoint = T4_PIPE_EP3_IN;
+            break;
+        default:
+            errno = EINVAL;
+            return 0;
+        }
+        break;
+    case T5_PRODUCT_ID:
+        isBulk = true;
+        switch (operation) {
+        case LJUSB_WRITE:
+            endpoint = T5_PIPE_EP1_OUT;
+            break;
+        case LJUSB_READ:
+            endpoint = T5_PIPE_EP2_IN;
+            break;
+        case LJUSB_STREAM:
+            endpoint = T5_PIPE_EP3_IN;
+            break;
+        default:
+            errno = EINVAL;
+            return 0;
+        }
+        break;
     case T7_PRODUCT_ID:
         isBulk = true;
         switch (operation) {
@@ -917,56 +962,38 @@ unsigned long LJUSB_BulkWrite(HANDLE hDevice, unsigned char endpoint, BYTE *pBuf
 }
 
 
-unsigned long LJUSB_Write(HANDLE hDevice, BYTE *pBuff, unsigned long count)
+unsigned long LJUSB_Write(HANDLE hDevice, const BYTE *pBuff, unsigned long count)
 {
-#if LJ_DEBUG
-    fprintf(stderr, "LJUSB_Write: calling LJUSB_Write.\n");
-#endif
-    return LJUSB_SetupTransfer(hDevice, pBuff, count, LJ_LIBUSB_TIMEOUT_DEFAULT, LJUSB_WRITE);
+    return LJUSB_SetupTransfer(hDevice, (BYTE *)pBuff, count, LJ_LIBUSB_TIMEOUT_DEFAULT, LJUSB_WRITE);
 }
 
 
 unsigned long LJUSB_Read(HANDLE hDevice, BYTE *pBuff, unsigned long count)
 {
-#if LJ_DEBUG
-    fprintf(stderr, "LJUSB_Read: calling LJUSB_Read.\n");
-#endif
     return LJUSB_SetupTransfer(hDevice, pBuff, count, LJ_LIBUSB_TIMEOUT_DEFAULT, LJUSB_READ);
 }
 
 
 unsigned long LJUSB_Stream(HANDLE hDevice, BYTE *pBuff, unsigned long count)
 {
-#if LJ_DEBUG
-    fprintf(stderr, "LJUSB_Stream: calling LJUSB_Stream.\n");
-#endif
     return LJUSB_SetupTransfer(hDevice, pBuff, count, LJ_LIBUSB_TIMEOUT_DEFAULT, LJUSB_STREAM);
 }
 
 
-unsigned long LJUSB_WriteTO(HANDLE hDevice, BYTE *pBuff, unsigned long count, unsigned int timeout)
+unsigned long LJUSB_WriteTO(HANDLE hDevice, const BYTE *pBuff, unsigned long count, unsigned int timeout)
 {
-#if LJ_DEBUG
-    fprintf(stderr, "LJUSB_Stream: calling LJUSB_WriteTO.\n");
-#endif
-    return LJUSB_SetupTransfer(hDevice, pBuff, count, timeout, LJUSB_WRITE);
+    return LJUSB_SetupTransfer(hDevice, (BYTE *)pBuff, count, timeout, LJUSB_WRITE);
 }
 
 
 unsigned long LJUSB_ReadTO(HANDLE hDevice, BYTE *pBuff, unsigned long count, unsigned int timeout)
 {
-#if LJ_DEBUG
-    fprintf(stderr, "LJUSB_Stream: calling LJUSB_ReadTO.\n");
-#endif
     return LJUSB_SetupTransfer(hDevice, pBuff, count, timeout, LJUSB_READ);
 }
 
 
 unsigned long LJUSB_StreamTO(HANDLE hDevice, BYTE *pBuff, unsigned long count, unsigned int timeout)
 {
-#if LJ_DEBUG
-    fprintf(stderr, "LJUSB_Stream: calling LJUSB_StreamTO.\n");
-#endif
     return LJUSB_SetupTransfer(hDevice, pBuff, count, timeout, LJUSB_STREAM);
 }
 
@@ -982,7 +1009,10 @@ void LJUSB_CloseDevice(HANDLE hDevice)
     }
 
     //Release
-    libusb_release_interface(hDevice, 0);
+    int r = libusb_release_interface(hDevice, 0);
+    if (r < 0) {
+        fprintf(stderr, "LJUSB_CloseDevice: failed to release interface\n");
+    }
 
     //Close
     libusb_close(hDevice);
@@ -1000,14 +1030,8 @@ unsigned int LJUSB_GetDevCount(unsigned long ProductID)
     unsigned int i = 0;
     unsigned int ljFoundCount = 0;
 
-    if (!gIsLibUSBInitialized) {
-        r = libusb_init(&gLJContext);
-        if (r < 0) {
-            fprintf(stderr, "failed to initialize libusb\n");
-            LJUSB_libusbError(r);
-            return 0;
-        }
-        gIsLibUSBInitialized = true;
+    if (!LJUSB_libusb_initialize()) {
+        return 0;
     }
 
     cnt = libusb_get_device_list(gLJContext, &devs);
@@ -1050,16 +1074,11 @@ unsigned int LJUSB_GetDevCounts(UINT *productCounts, UINT * productIds, UINT n)
     unsigned int u3ProductCount = 0, u6ProductCount = 0;
     unsigned int ue9ProductCount = 0, u12ProductCount = 0;
     unsigned int bridgeProductCount = 0, t7ProductCount = 0;
-    unsigned int digitProductCount = 0, allProductCount = 0;
+    unsigned int digitProductCount = 0, t4ProductCount = 0;
+    unsigned int t5ProductCount = 0, allProductCount = 0;
 
-    if (!gIsLibUSBInitialized) {
-        r = libusb_init(&gLJContext);
-        if (r < 0) {
-            fprintf(stderr, "failed to initialize libusb\n");
-            LJUSB_libusbError(r);
-            return 0;
-        }
-        gIsLibUSBInitialized = true;
+    if (!LJUSB_libusb_initialize()) {
+        return 0;
     }
 
     cnt = libusb_get_device_list(gLJContext, &devs);
@@ -1097,6 +1116,12 @@ unsigned int LJUSB_GetDevCounts(UINT *productCounts, UINT * productIds, UINT n)
                 break;
             case BRIDGE_PRODUCT_ID:
                 bridgeProductCount++;
+                break;
+            case T4_PRODUCT_ID:
+                t4ProductCount++;
+                break;
+            case T5_PRODUCT_ID:
+                t5ProductCount++;
                 break;
             case T7_PRODUCT_ID:
                 t7ProductCount++;
@@ -1145,6 +1170,16 @@ unsigned int LJUSB_GetDevCounts(UINT *productCounts, UINT * productIds, UINT n)
             productCounts[i] = digitProductCount;
             productIds[i] = DIGIT_PRODUCT_ID;
             allProductCount += digitProductCount;
+            break;
+        case 7:
+            productCounts[i] = t4ProductCount;
+            productIds[i] = T4_PRODUCT_ID;
+            allProductCount += t4ProductCount;
+            break;
+        case 8:
+            productCounts[i] = t5ProductCount;
+            productIds[i] = T5_PRODUCT_ID;
+            allProductCount += t5ProductCount;
             break;
         }
     }

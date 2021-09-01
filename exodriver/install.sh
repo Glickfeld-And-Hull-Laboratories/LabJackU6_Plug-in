@@ -1,16 +1,17 @@
 #! /bin/bash
 
-RULES=10-labjack.rules
+RULES=90-labjack.rules
+OLD_RULES=10-labjack.rules
 RULES_DEST_PRIMARY=/lib/udev/rules.d
 RULES_DEST_ALTERNATE=/etc/udev/rules.d
-GROUP=adm
 SUPPORT_EMAIL=support@labjack.com
-TRUE=0
+TRUE=1
+FALSE=0
+IS_SUCCESS=$TRUE
 # Assume these are unneeded until otherwise
-NEED_RECONNECT=1
-NEED_RESTART=1
-NEED_RELOG=1
-NO_RULES=1
+NEED_RECONNECT=$FALSE
+NEED_RESTART=$FALSE
+NO_RULES=$FALSE
 NO_RULES_ERR=2
 
 go ()
@@ -28,21 +29,19 @@ go ()
 success ()
 {
 	e=0
-	echo "Install finished. Thanks for choosing LabJack."
+	if [ $IS_SUCCESS -eq $TRUE ]; then
+		echo "Install finished. Thank you for choosing LabJack."
+	fi
 	if [ $NEED_RECONNECT -eq $TRUE ]; then
 		echo "If you have any LabJack devices connected, please disconnect and reconnect them now for device rule changes to take effect."
 	fi
 	if [ $NO_RULES -eq $TRUE ]; then
 		echo "No udev rules directory found. Searched for $RULES_DEST_PRIMARY, $RULES_DEST_ALTERNATE."
-		echo "Please copy $RULES to your device rules directory and reload the rules or contact LabJack support for assistence: <$SUPPORT_EMAIL>"
+		echo "Please copy $RULES to your device rules directory and reload the rules or contact LabJack support for assistance: <$SUPPORT_EMAIL>"
 		let e=e+$NO_RULES_ERR
 	fi
 	if [ $NEED_RESTART -eq $TRUE ]; then
 		echo "Please manually restart the device rules or restart your computer now."
-	elif [ $NEED_RELOG -eq $TRUE ]; then
-		echo "Please log off and log back in for the group changes to take effect. To confirm the group changes have taken effect, enter the command:"
-		echo "  $ groups"
-		echo "and make sure $GROUP is in the list. (You probably have to log out of your entire account, not just your shell.)"
 	fi
 	exit $e
 }
@@ -69,8 +68,16 @@ go cd ../
 #################
 # LabJack Rules #
 #################
+rm -f $RULES_DEST_PRIMARY/$OLD_RULES
+rm -f $RULES_DEST_ALTERNATE/$OLD_RULES
+
 if [ -d $RULES_DEST_PRIMARY ]; then
 	RULES_DEST=$RULES_DEST_PRIMARY
+
+	OLD_FILE_TO_REMOVE=$RULES_DEST_ALTERNATE/$RULES
+	if [ -f $OLD_FILE_TO_REMOVE ]; then
+		rm $OLD_FILE_TO_REMOVE
+	fi
 elif [ -d $RULES_DEST_ALTERNATE ]; then
 	RULES_DEST=$RULES_DEST_ALTERNATE
 else
@@ -89,61 +96,23 @@ fi
 echo -n "Restarting the rules.."
 udevadm control --reload-rules 2> /dev/null
 ret=$?
-if [ ! $ret ]; then
+if [ $ret -ne 0 ]; then
 	udevadm control --reload_rules 2> /dev/null
 	ret=$?
 fi
-if [ ! $ret ]; then
+if [ $ret -ne 0 ]; then
 	/etc/init.d/udev-post reload 2> /dev/null
 	ret=$?
 fi
-if [ ! $ret ]; then
+if [ $ret -ne 0 ]; then
 	udevstart 2> /dev/null
 	ret=$?
 fi
-if [ ! $ret ]; then
+if [ $ret -ne 0 ]; then
 	NEED_RESTART=$TRUE
-	echo " cound not restart the rules."
+	echo " could not restart the rules."
 else
 	echo # Finishes previous echo -n
 fi
-
-#####################
-# Add user to group #
-#####################
-if [ $USER == "root" ]; then
-	user=$SUDO_USER
-else
-	user=$USER
-fi
-
-in_group=1
-for g in `id -nG $user`; do
-	if [ "$g" == "$GROUP" ]; then
-		in_group=$TRUE
-		break
-	fi
-done
-
-if [ $in_group -eq $TRUE ]; then
-	# Make sure the user is logged into the adm group
-	current_groups=1
-	for g in `groups $user`; do
-		if [ "$g" == "$GROUP" ]; then
-			current_groups=$TRUE
-			break
-		fi
-	done
-	if [ $current_groups -ne $TRUE ]; then
-		NEED_RELOG=$TRUE
-	fi
-
-	success
-fi
-
-echo "Adding $user to the $GROUP group.."
-go groupadd -f $GROUP
-go usermod -a -G $GROUP $user
-NEED_RELOG=$TRUE
 
 success

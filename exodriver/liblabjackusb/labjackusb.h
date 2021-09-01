@@ -61,13 +61,19 @@
 //       - Initial T7 support
 //       - Initial Digit support
 //       - Added LJUSB_ResetConnection function.
+//  2.0503 - Fixed open calls to not steal handles from other processes on
+//           Linux.
+//         - libusb error prints are silenced when LJ_DEBUG is not enabled.
+//         - Added revision number to library version number. The float version
+//           number 2.0503 is equivalent to 2.5.3 (major.minor.revision).
+//  2.0600 - Initial T4 and T5 support
 //-----------------------------------------------------------------------------
 //
 
 #ifndef LABJACKUSB_H_
 #define LABJACKUSB_H_
 
-#define LJUSB_LIBRARY_VERSION 2.05f
+#define LJUSB_LIBRARY_VERSION 2.0600f
 
 #include <stdbool.h>
 
@@ -84,6 +90,8 @@ typedef unsigned char BYTE;
 #define U6_PRODUCT_ID          6
 #define U12_PRODUCT_ID         1
 #define BRIDGE_PRODUCT_ID      1000
+#define T4_PRODUCT_ID          4
+#define T5_PRODUCT_ID          5 // Pending future development
 #define T7_PRODUCT_ID          7
 #define DIGIT_PRODUCT_ID       200
 #define UNUSED_PRODUCT_ID      -1
@@ -112,6 +120,16 @@ typedef unsigned char BYTE;
 #define BRIDGE_PIPE_EP1_OUT    1
 #define BRIDGE_PIPE_EP2_IN     0x82
 #define BRIDGE_PIPE_EP3_IN     0x83  //Spontaneous Endpoint
+
+//T4 pipes to read/write through
+#define T4_PIPE_EP1_OUT        1
+#define T4_PIPE_EP2_IN         0x82
+#define T4_PIPE_EP3_IN         0x83  //Stream Endpoint
+
+//T5 pipes to read/write through
+#define T5_PIPE_EP1_OUT        1
+#define T5_PIPE_EP2_IN         0x82
+#define T5_PIPE_EP3_IN         0x83  //Stream Endpoint
 
 //T7 pipes to read/write through
 #define T7_PIPE_EP1_OUT        1
@@ -144,8 +162,8 @@ unsigned int LJUSB_GetDevCounts(UINT *productCounts, UINT * productIds, UINT n);
 //   uint productCounts[10], productIds[10];
 //   r = LJUSB_GetDevCounts(productCounts, productIds, 10);
 // would return arrays that may look like
-//   {1, 2, 3, 4, 5, 6, 7, 0, 0, 0}
-//   {3, 6, 9, 1, 1000, 7, 200, 0, 0, 0}
+//   {1, 2, 3, 4,    5, 6,   7, 8, 9, 0}
+//   {3, 6, 9, 1, 1000, 7, 200, 4, 5, 0}
 // which means there are
 //   1 U3
 //   2 U6s
@@ -154,6 +172,8 @@ unsigned int LJUSB_GetDevCounts(UINT *productCounts, UINT * productIds, UINT n);
 //   5 SkyMote Bridges
 //   6 T7s
 //   7 Digits
+//   8 T4s
+//   9 T5s
 // connected.
 
 int LJUSB_OpenAllDevices(HANDLE* devHandles, UINT* productIds, UINT maxDevices);
@@ -188,7 +208,7 @@ bool LJUSB_ResetConnection(HANDLE hDevice);
 // and you should re-open the device.
 // hDevice = The handle for your device
 
-unsigned long LJUSB_Write(HANDLE hDevice, BYTE *pBuff, unsigned long count);
+unsigned long LJUSB_Write(HANDLE hDevice, const BYTE *pBuff, unsigned long count);
 // Writes to a device with a 1 second timeout.  If the timeout time elapses and
 // no data is transferred the USB request is aborted and the call returns.
 // Returns the number of bytes written, or 0 on error and errno is set.
@@ -219,7 +239,7 @@ unsigned long LJUSB_Stream(HANDLE hDevice, BYTE *pBuff, unsigned long count);
 // This function replaces the deprecated LJUSB_BulkRead, which required the
 // (stream) endpoint.
 
-unsigned long LJUSB_WriteTO(HANDLE hDevice, BYTE *pBuff, unsigned long count, unsigned int timeout);
+unsigned long LJUSB_WriteTO(HANDLE hDevice, const BYTE *pBuff, unsigned long count, unsigned int timeout);
 // Writes to a device with a specified timeout.  If the timeout time elapses and
 // no data is transferred the USB request is aborted and the call returns.
 // Returns the number of bytes written, or 0 on error and errno is set.

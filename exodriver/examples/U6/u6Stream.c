@@ -59,7 +59,7 @@ int ConfigIO_example(HANDLE hDevice)
     int sendChars, recChars, i;
 
     sendBuff[1] = (uint8)(0xF8);  //Command byte
-    sendBuff[2] = (uint8)(0x03);  //Number of data words
+    sendBuff[2] = (uint8)(0x05);  //Number of data words
     sendBuff[3] = (uint8)(0x0B);  //Extended command number
 
     sendBuff[6] = 1;  //Writemask : Setting writemask for TimerCounterConfig (bit 0)
@@ -92,7 +92,7 @@ int ConfigIO_example(HANDLE hDevice)
         return -1;
     }
 
-    checksumTotal = extendedChecksum16(recBuff, 15);
+    checksumTotal = extendedChecksum16(recBuff, 16);
     if( (uint8)((checksumTotal / 256 ) & 0xff) != recBuff[5] )
     {
         printf("ConfigIO error : read buffer has bad checksum16(MSB)\n");
