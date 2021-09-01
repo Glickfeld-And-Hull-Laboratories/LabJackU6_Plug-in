@@ -711,7 +711,7 @@ long eAIN(HANDLE Handle, u6CalibrationInfo *CalibrationInfo, long ChannelP, long
         return -1;
     }
 
-    if( Settling < 0 && Settling > 4 )
+    if( Settling < 0 || Settling > 4 )
     {
         printf("eAIN error: Invalid Settling value\n");
         return -1;
@@ -856,7 +856,7 @@ long eTCConfig(HANDLE Handle, long *aEnableTimers, long *aEnableCounters, long T
     int sendDataBuffSize, i;
     long error;
  
-    if( TCPinOffset < 0 && TCPinOffset > 8)
+    if( TCPinOffset < 0 || TCPinOffset > 8)
     {
         printf("eTCConfig error: Invalid TCPinOffset.\n");
         return -1;

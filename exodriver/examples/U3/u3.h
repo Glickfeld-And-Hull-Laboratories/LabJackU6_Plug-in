@@ -1,5 +1,5 @@
 //Author: LabJack
-//December 27, 2011
+//April 8, 2016
 //Header for U3 example helper functions.
 //
 //History
@@ -13,6 +13,7 @@
 // functions that apply the calibration constants. (06/25/2009)
 //-Replaced LJUSB_BulkWrite/Read with LJUSB_write/Read calls.  Added serial
 // number support to openUSBConnection. (12/27/2011)
+//-Updated functions to have C bindings. (04/08/2016)
 
 #ifndef U3_H_
 #define U3_H_
@@ -23,6 +24,10 @@
 #include <stdlib.h>
 #include "labjackusb.h"
 
+
+#ifdef __cplusplus
+extern "C"{
+#endif
 
 typedef unsigned char uint8;
 typedef unsigned short uint16;
@@ -116,7 +121,7 @@ HANDLE openUSBConnection( int localID);
 void closeUSBConnection( HANDLE hDevice);
 //Closes a HANDLE to a U3 device.
 
-long getTickCount();
+long getTickCount( void);
 //Returns the number of milliseconds that has elasped since the system was
 //started.
 
@@ -496,7 +501,7 @@ long eTCConfig( HANDLE Handle,
 //                  must always have at least 2 elements.
 //TCPinOffset = Value from 0-8 specifies where to start assigning timers and
 //              counters.
-//              For U3 hardware versions 1.30, HV model, value needs to be 4-8.
+//              For U3 hardware version 1.30 (LV/HV), the value needs to be 4-8.
 //TimerClockBaseIndex = Pass a constant to set the timer base clock.  The
 //                      default is LJ_tc48MHZ.
 //TimerClockDivisor = Pass a divisor from 0-255 where 0 is a divisor of 256.
@@ -595,7 +600,6 @@ long ehFeedback( HANDLE hDevice,
 
 /* Easy function constants */
 
-
 /* Timer clocks for Hardware Version 1.20 or lower */
 
 // 2 MHz
@@ -687,5 +691,9 @@ long ehFeedback( HANDLE hDevice,
 
 // 16-bit falling to falling edge measurement
 #define LJ_tmFALLINGEDGES16 13
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif
