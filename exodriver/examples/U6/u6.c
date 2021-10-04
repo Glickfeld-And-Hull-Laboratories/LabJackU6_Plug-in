@@ -449,7 +449,7 @@ long getDacBinVoltCalibrated8Bit(u6CalibrationInfo *caliInfo, int dacNumber, dou
 
 long getDacBinVoltCalibrated16Bit(u6CalibrationInfo *caliInfo, int dacNumber, double analogVolt, uint16 *bytesVolt16)
 {
-    uint32 dBytesVolt;
+    double dBytesVolt;
 
     if( isCalibrationInfoValid(caliInfo) == 0 )
         return -1;
@@ -463,7 +463,9 @@ long getDacBinVoltCalibrated16Bit(u6CalibrationInfo *caliInfo, int dacNumber, do
     dBytesVolt = analogVolt*caliInfo->ccConstants[16 + dacNumber*2] + caliInfo->ccConstants[17 + dacNumber*2];
 
     //Checking to make sure bytesVolt will be a value between 0 and 65535.
-    if( dBytesVolt > 65535 )
+    if( dBytesVolt < 0 )
+        dBytesVolt = 0;
+    else if( dBytesVolt > 65535 )
         dBytesVolt = 65535;
 
     *bytesVolt16 = (uint16)dBytesVolt;
@@ -486,7 +488,7 @@ long getTempKCalibrated(u6CalibrationInfo *caliInfo, int resolutionIndex, int ga
 
 long getTdacBinVoltCalibrated(u6TdacCalibrationInfo *caliInfo, int dacNumber, double analogVolt, uint16 *bytesVolt)
 {
-    uint32 dBytesVolt;
+    double dBytesVolt;
 
     if( isTdacCalibrationInfoValid(caliInfo) == 0 )
         return -1;
@@ -500,7 +502,9 @@ long getTdacBinVoltCalibrated(u6TdacCalibrationInfo *caliInfo, int dacNumber, do
     dBytesVolt = analogVolt*caliInfo->ccConstants[dacNumber*2] + caliInfo->ccConstants[dacNumber*2 + 1];
 
     //Checking to make sure bytesVolt will be a value between 0 and 65535.
-    if( dBytesVolt > 65535 )
+    if( dBytesVolt < 0 )
+        dBytesVolt = 0;
+    else if( dBytesVolt > 65535 )
         dBytesVolt = 65535;
 
     *bytesVolt = (uint16)dBytesVolt;
