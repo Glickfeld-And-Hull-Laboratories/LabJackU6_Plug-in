@@ -208,6 +208,7 @@ do_wheelspeed(parameters[DO_WHEELSPEED]),
 ws_durationUS(parameters[WS_DURATIONUS]),
 wheel_speed(parameters[WHEEL_SPEED]),
 puffDuration(parameters[PUFF_DURATION]),
+active(false),
 deviceIOrunning(false)
 {
     if (VERBOSE_IO_DEVICE >= 2) {
@@ -771,7 +772,6 @@ bool LabJackU6Device::initialize() {
     boost::mutex::scoped_lock lock(ljU6DriverLock);
     assert(ljHandle == NULL);  // should not try to configure if already open.  Perhaps can relax this in the future
     ljHandle = openUSBConnection(-1);						    // Open first available U6 on USB
-    ljU6DriverLock.unlock();
     
     
     if (ljHandle == NULL) {
@@ -827,9 +827,7 @@ bool LabJackU6Device::initialize() {
 
 bool LabJackU6Device::setupU6PortsAndRestartIfDead() {
     // This is not a pleasant solution, but it works for now
-    // takes and releases lock
     
-    boost::mutex::scoped_lock lock(ljU6DriverLock);
     assert(ljHandle != NULL);  // you must have opened before calling this
     
     // Do physical port setup
@@ -898,7 +896,10 @@ bool LabJackU6Device::startDeviceIO(){
     }
     
     // check hardware and restart if necessary
-    setupU6PortsAndRestartIfDead();
+    {
+        boost::mutex::scoped_lock lock(ljU6DriverLock);
+        setupU6PortsAndRestartIfDead();
+    }
     
     //	schedule_nodes_lock.lock();			// Seems to be no longer supported in MWorks
     
