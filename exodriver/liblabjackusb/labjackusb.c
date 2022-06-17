@@ -44,7 +44,7 @@
 #define MIN_U6_FIRMWARE_MINOR   81
 
 // Set to 0 for no debug logging or 1 for logging.
-#define LJ_DEBUG 0
+#define LJ_DEBUG 1
 
 static bool gIsLibUSBInitialized = false;
 static struct libusb_context *gLJContext = NULL;
