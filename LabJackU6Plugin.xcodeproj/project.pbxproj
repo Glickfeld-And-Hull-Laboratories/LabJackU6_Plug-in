@@ -39,6 +39,7 @@
 		81BCE9CA1180B39E00C0AC5B /* LabJackU6Plugin.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 81BCE9C91180B39E00C0AC5B /* LabJackU6Plugin.cpp */; };
 		81BCE9CE1180B3A600C0AC5B /* LabJackU6Device.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 81BCE9CB1180B3A600C0AC5B /* LabJackU6Device.cpp */; };
 		8D5B49B0048680CD000E48DA /* InfoPlist.strings in Resources */ = {isa = PBXBuildFile; fileRef = 089C167DFE841241C02AAC07 /* InfoPlist.strings */; };
+		E1364AA727BE9A9C008BEB1D /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E1364AA627BE9A9C008BEB1D /* Security.framework */; };
 		E18840C626A220080087D106 /* labjackusb.c in Sources */ = {isa = PBXBuildFile; fileRef = E18840C426A220080087D106 /* labjackusb.c */; };
 		E18840C826A220800087D106 /* CoreFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E18840C726A220800087D106 /* CoreFoundation.framework */; };
 		E18840CA26A220960087D106 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E18840C926A220960087D106 /* IOKit.framework */; };
@@ -87,6 +88,7 @@
 		81BCE9CD1180B3A600C0AC5B /* LabJackU6Plugin_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LabJackU6Plugin_Prefix.pch; sourceTree = "<group>"; };
 		81BCEAB21180EDE000C0AC5B /* LabJackU6Plugin.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LabJackU6Plugin.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D5B49B7048680CD000E48DA /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		E1364AA627BE9A9C008BEB1D /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
 		E18840C426A220080087D106 /* labjackusb.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; name = labjackusb.c; path = exodriver/liblabjackusb/labjackusb.c; sourceTree = "<group>"; };
 		E18840C526A220080087D106 /* labjackusb.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = labjackusb.h; path = exodriver/liblabjackusb/labjackusb.h; sourceTree = "<group>"; };
 		E18840C726A220800087D106 /* CoreFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreFoundation.framework; path = System/Library/Frameworks/CoreFoundation.framework; sourceTree = SDKROOT; };
@@ -103,6 +105,7 @@
 				5C4B0A650DC79212001BC518 /* MWorksCore.framework in Frameworks */,
 				E18840C826A220800087D106 /* CoreFoundation.framework in Frameworks */,
 				E18840CA26A220960087D106 /* IOKit.framework in Frameworks */,
+				E1364AA727BE9A9C008BEB1D /* Security.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -128,6 +131,7 @@
 				5C4B0A630DC79212001BC518 /* MWorksCore.framework */,
 				E18840C726A220800087D106 /* CoreFoundation.framework */,
 				E18840C926A220960087D106 /* IOKit.framework */,
+				E1364AA627BE9A9C008BEB1D /* Security.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";

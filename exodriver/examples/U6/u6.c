@@ -203,7 +203,7 @@ void closeUSBConnection(HANDLE hDevice)
 }
 
 
-long getTickCount()
+long getTickCount(void)
 {
     struct timeval tv;
 
