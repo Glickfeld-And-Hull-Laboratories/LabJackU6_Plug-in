@@ -1053,7 +1053,6 @@ void LabJackU6Device::detachPhysicalDevice() {
     if (VERBOSE_IO_DEVICE >= 1) {
         mprintf("LabJackU6Device: detachPhysicalDevice");
     }
-    assert(connected == true); // "Was not connected on entry to detachPhysicalDevice");
     
     boost::mutex::scoped_lock lock(ljU6DriverLock);
     //printf("lock in detachP\n");
